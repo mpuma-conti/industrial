@@ -1,0 +1,652 @@
+[
+    {
+        "id": "1c4a6ecf14ab2dd6",
+        "type": "subflow",
+        "name": "Alarma Rango Analógico",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 120,
+                "y": 40,
+                "wires": [
+                    {
+                        "id": "bf266622de6dda80"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 360,
+                "y": 40,
+                "wires": [
+                    {
+                        "id": "bf266622de6dda80",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "min",
+                "type": "num",
+                "value": "10"
+            },
+            {
+                "name": "max",
+                "type": "num",
+                "value": "90"
+            },
+            {
+                "name": "msg_alarm",
+                "type": "str",
+                "value": "⚠️ Fuera de rango"
+            },
+            {
+                "name": "msg_normal",
+                "type": "str",
+                "value": "✅ Normalizado"
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "bf266622de6dda80",
+        "type": "function",
+        "z": "1c4a6ecf14ab2dd6",
+        "name": "function 5",
+        "func": "// Valor actual\nlet valor = msg.payload;\n\n// Parámetros del subflow\nconst MIN = Number(env.get(\"min\"));\nconst MAX = Number(env.get(\"max\"));\nconst MSG_ALARMA = env.get(\"msg_alarm\");\nconst MSG_NORMAL = env.get(\"msg_normal\");\n\n// Estado previo\nlet estado = context.get(\"estado\") || \"normal\";\n\nlet nuevoEstado = estado;\nlet mensaje = null;\n\n// Evaluación\nif (valor < MIN || valor > MAX) {\n\n    if (estado === \"normal\") {\n        nuevoEstado = \"alarma\";\n        mensaje = `${MSG_ALARMA}: ${valor}`;\n    }\n\n} else {\n\n    if (estado === \"alarma\") {\n        nuevoEstado = \"normal\";\n        mensaje = `${MSG_NORMAL}: ${valor}`;\n    }\n}\n\n// Guardar estado\ncontext.set(\"estado\", nuevoEstado);\n\n// Enviar solo si hay mensaje\nif (mensaje) {\n    msg.payload = mensaje;\n    return msg;\n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7d99d85256abc4c6",
+        "type": "tab",
+        "label": "OPC-UA",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "21344719d4cc79cf",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1040,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ae2067987c9e29e5",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "44cfd988420a9b2d",
+        "type": "inject",
+        "z": "7d99d85256abc4c6",
+        "name": "Read",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 90,
+        "y": 60,
+        "wires": [
+            [
+                "01da8d7b9aaff1aa"
+            ]
+        ]
+    },
+    {
+        "id": "53cb7498954a9be0",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 1",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 40,
+        "wires": [
+            [
+                "21344719d4cc79cf"
+            ]
+        ]
+    },
+    {
+        "id": "2f6438e3390e6ef9",
+        "type": "comment",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "info": "operativo, lee por OPC y envia a ThingSpeak\nEl intervalo que acepta ThingSpeak es 15 seg",
+        "x": 80,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "a859e9ad6f9eebce",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1180,
+        "y": 220,
+        "wires": [
+            [
+                "a62f1fcff583fd86"
+            ]
+        ]
+    },
+    {
+        "id": "c62c1aa1bf9f62f0",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "2732a7449ab1459a",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 3",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field3=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 220,
+        "wires": [
+            [
+                "a859e9ad6f9eebce"
+            ]
+        ]
+    },
+    {
+        "id": "f556babc4bb63ead",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "c48faff111c72938",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 4",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field4=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 440,
+        "wires": [
+            [
+                "34c6e1de36f02b09"
+            ]
+        ]
+    },
+    {
+        "id": "34c6e1de36f02b09",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1040,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "01da8d7b9aaff1aa",
+        "type": "delay",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "0",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 270,
+        "y": 320,
+        "wires": [
+            [
+                "d946782a5ad880ee"
+            ]
+        ]
+    },
+    {
+        "id": "8ad8f80856440ade",
+        "type": "delay",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "45",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 270,
+        "y": 460,
+        "wires": [
+            [
+                "75f2f6054145a6ae"
+            ]
+        ]
+    },
+    {
+        "id": "a5db4bdffce56e8d",
+        "type": "delay",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "15",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 270,
+        "y": 60,
+        "wires": [
+            [
+                "1d8d2514591e1156"
+            ]
+        ]
+    },
+    {
+        "id": "a62f1fcff583fd86",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "1d8d2514591e1156",
+        "type": "OpcUa-Item",
+        "z": "7d99d85256abc4c6",
+        "item": "ns=2;s=PLC_S_COMPR.S_COMPR.M251data.GVL_TEMP_EPTSA_CHIMENEA (%MD51)",
+        "datatype": "opcua.DataType.Double",
+        "value": "",
+        "name": "TEMP_EPTSA",
+        "x": 440,
+        "y": 60,
+        "wires": [
+            [
+                "3a3b14f942826019"
+            ]
+        ]
+    },
+    {
+        "id": "d946782a5ad880ee",
+        "type": "OpcUa-Item",
+        "z": "7d99d85256abc4c6",
+        "item": "ns=2;s=MODBUS_TCP.ION7650_Subestacion.Voltage_AB",
+        "datatype": "opcua.DataType.Double",
+        "value": "",
+        "name": "V_AB subest",
+        "x": 430,
+        "y": 320,
+        "wires": [
+            [
+                "64a6ea0b1a3bbcc4"
+            ]
+        ]
+    },
+    {
+        "id": "75f2f6054145a6ae",
+        "type": "OpcUa-Item",
+        "z": "7d99d85256abc4c6",
+        "item": "ns=2;s=MODBUS_TCP.ION7650_Subestacion.Current_A",
+        "datatype": "opcua.DataType.Double",
+        "value": "",
+        "name": "I_A subest",
+        "x": 430,
+        "y": 460,
+        "wires": [
+            [
+                "cce1c34910b8aac6"
+            ]
+        ]
+    },
+    {
+        "id": "3a3b14f942826019",
+        "type": "OpcUa-Client",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "9e73cae136aca414",
+        "action": "read",
+        "deadbandvalue": "",
+        "time": "",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": true,
+        "name": "KEPServer",
+        "x": 610,
+        "y": 60,
+        "wires": [
+            [
+                "53cb7498954a9be0",
+                "ae2067987c9e29e5"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "64a6ea0b1a3bbcc4",
+        "type": "OpcUa-Client",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "9e73cae136aca414",
+        "action": "read",
+        "deadbandvalue": "",
+        "time": "",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": true,
+        "name": "KEPServer",
+        "x": 610,
+        "y": 320,
+        "wires": [
+            [
+                "c62c1aa1bf9f62f0",
+                "22f3672df8aceb39"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "cce1c34910b8aac6",
+        "type": "OpcUa-Client",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "9e73cae136aca414",
+        "action": "read",
+        "deadbandvalue": "",
+        "time": "",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": true,
+        "name": "KEPServer",
+        "x": 610,
+        "y": 460,
+        "wires": [
+            [
+                "c48faff111c72938",
+                "f556babc4bb63ead"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "22f3672df8aceb39",
+        "type": "subflow:1c4a6ecf14ab2dd6",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "env": [
+            {
+                "name": "min",
+                "value": "9500",
+                "type": "num"
+            },
+            {
+                "name": "max",
+                "value": "10500",
+                "type": "num"
+            }
+        ],
+        "x": 850,
+        "y": 320,
+        "wires": [
+            [
+                "70b64b21ec920788"
+            ]
+        ]
+    },
+    {
+        "id": "a450aaa06f7ea933",
+        "type": "telegram sender",
+        "z": "7d99d85256abc4c6",
+        "name": "Inkabor Bot",
+        "bot": "51c77708d58bab94",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1290,
+        "y": 320,
+        "wires": [
+            [
+                "2ec7409f097b6560"
+            ]
+        ]
+    },
+    {
+        "id": "2ec7409f097b6560",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1460,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "70b64b21ec920788",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "format to Telegram",
+        "func": "let texto = msg.payload;\nlet fecha = new Date().toLocaleString(\"es-PE\");\n\nlet mensaje =\n`*Tensión de subestación*\n${texto} V\n📅 ${fecha}`;\n\nmsg.payload = {\n    type: \"message\",\n    content: mensaje,\n    chatId: \"-1003746509670\", //id de grupo de telegram\n    options: {\n        parse_mode: \"Markdown\"\n    }\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 320,
+        "wires": [
+            [
+                "a450aaa06f7ea933"
+            ]
+        ]
+    },
+    {
+        "id": "9e73cae136aca414",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://10.10.10.23:49370",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "51c77708d58bab94",
+        "type": "telegram bot",
+        "botname": "inkabor_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": 300,
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": 6667,
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": 8443,
+        "publicbotport": 8443,
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "1de04175f561544b",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-opcua": "0.2.340",
+            "node-red-contrib-telegrambot": "17.0.5"
+        }
+    }
+]

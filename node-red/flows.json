@@ -1,0 +1,586 @@
+[
+    {
+        "id": "7d99d85256abc4c6",
+        "type": "tab",
+        "label": "Flujo 1",
+        "disabled": false,
+        "info": "Comunicacion por Ethernet IP y OPC UA para enviar datos por http a Thingspeak",
+        "env": []
+    },
+    {
+        "id": "21344719d4cc79cf",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1040,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ae2067987c9e29e5",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "1d8d2514591e1156",
+        "type": "OpcUa-Item",
+        "z": "7d99d85256abc4c6",
+        "item": "ns=2;s=PLC_S_COMPR.S_COMPR.M251data.GVL_TEMP_EPTSA_CHIMENEA (%MD51)",
+        "datatype": "opcua.DataType.Double",
+        "value": "",
+        "name": "TEMP_EPTSA",
+        "x": 440,
+        "y": 60,
+        "wires": [
+            [
+                "3a3b14f942826019"
+            ]
+        ]
+    },
+    {
+        "id": "44cfd988420a9b2d",
+        "type": "inject",
+        "z": "7d99d85256abc4c6",
+        "name": "Read",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "32",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 90,
+        "y": 60,
+        "wires": [
+            [
+                "01da8d7b9aaff1aa"
+            ]
+        ]
+    },
+    {
+        "id": "3a3b14f942826019",
+        "type": "OpcUa-Client",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "9e73cae136aca414",
+        "action": "read",
+        "deadbandvalue": "",
+        "time": "",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": true,
+        "name": "KEPServer",
+        "x": 610,
+        "y": 60,
+        "wires": [
+            [
+                "53cb7498954a9be0",
+                "ae2067987c9e29e5"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "53cb7498954a9be0",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 1",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field1=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 40,
+        "wires": [
+            [
+                "21344719d4cc79cf"
+            ]
+        ]
+    },
+    {
+        "id": "2f6438e3390e6ef9",
+        "type": "comment",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "info": "operativo, lee por OPC y envia a ThingSpeak\nEl intervalo que acepta ThingSpeak es 15 seg",
+        "x": 80,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "da7bb00a9200951f",
+        "type": "eth-ip in",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "3e6201438520f0d0",
+        "mode": "single",
+        "variable": "Program:MainProgram.LE201",
+        "program": "",
+        "name": "LE201",
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "f5fe22bbfee7ec28",
+                "adc1bcbe52e7bed2"
+            ]
+        ]
+    },
+    {
+        "id": "f5fe22bbfee7ec28",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c6380e339264841c",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 620,
+        "y": 180,
+        "wires": [
+            [
+                "fd1ee93eb1353643"
+            ]
+        ]
+    },
+    {
+        "id": "adc1bcbe52e7bed2",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 2",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field2=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 180,
+        "wires": [
+            [
+                "c6380e339264841c"
+            ]
+        ]
+    },
+    {
+        "id": "a859e9ad6f9eebce",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1040,
+        "y": 300,
+        "wires": [
+            [
+                "a62f1fcff583fd86"
+            ]
+        ]
+    },
+    {
+        "id": "c62c1aa1bf9f62f0",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "d946782a5ad880ee",
+        "type": "OpcUa-Item",
+        "z": "7d99d85256abc4c6",
+        "item": "ns=2;s=MODBUS_TCP.ION7650_Subestacion.Voltage_AB",
+        "datatype": "opcua.DataType.Double",
+        "value": "",
+        "name": "V_AB subest",
+        "x": 430,
+        "y": 320,
+        "wires": [
+            [
+                "64a6ea0b1a3bbcc4"
+            ]
+        ]
+    },
+    {
+        "id": "64a6ea0b1a3bbcc4",
+        "type": "OpcUa-Client",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "9e73cae136aca414",
+        "action": "read",
+        "deadbandvalue": "",
+        "time": "",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": true,
+        "name": "KEPServer",
+        "x": 610,
+        "y": 320,
+        "wires": [
+            [
+                "2732a7449ab1459a",
+                "c62c1aa1bf9f62f0"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2732a7449ab1459a",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 3",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field3=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 300,
+        "wires": [
+            [
+                "a859e9ad6f9eebce"
+            ]
+        ]
+    },
+    {
+        "id": "f556babc4bb63ead",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "Read value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "75f2f6054145a6ae",
+        "type": "OpcUa-Item",
+        "z": "7d99d85256abc4c6",
+        "item": "ns=2;s=MODBUS_TCP.ION7650_Subestacion.Current_A",
+        "datatype": "opcua.DataType.Double",
+        "value": "",
+        "name": "I_A subest",
+        "x": 430,
+        "y": 460,
+        "wires": [
+            [
+                "cce1c34910b8aac6"
+            ]
+        ]
+    },
+    {
+        "id": "cce1c34910b8aac6",
+        "type": "OpcUa-Client",
+        "z": "7d99d85256abc4c6",
+        "endpoint": "9e73cae136aca414",
+        "action": "read",
+        "deadbandvalue": "",
+        "time": "",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": true,
+        "name": "KEPServer",
+        "x": 610,
+        "y": 460,
+        "wires": [
+            [
+                "c48faff111c72938",
+                "f556babc4bb63ead"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c48faff111c72938",
+        "type": "function",
+        "z": "7d99d85256abc4c6",
+        "name": "function 4",
+        "func": "let apiKey = \"XVHBEI73XQKCOL4S\";   // tu API Key de ThingSpeak\nlet value = msg.payload;          // lo que llega desde el nodo EtherNet/IP\n\nmsg.method = \"GET\";\nmsg.url = `https://api.thingspeak.com/update?api_key=${apiKey}&field4=${value}`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 440,
+        "wires": [
+            [
+                "34c6e1de36f02b09"
+            ]
+        ]
+    },
+    {
+        "id": "34c6e1de36f02b09",
+        "type": "http request",
+        "z": "7d99d85256abc4c6",
+        "name": "Thingspeak Channel Cota 0",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1040,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "01da8d7b9aaff1aa",
+        "type": "delay",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "16",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 270,
+        "y": 320,
+        "wires": [
+            [
+                "d946782a5ad880ee"
+            ]
+        ]
+    },
+    {
+        "id": "8ad8f80856440ade",
+        "type": "delay",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "45",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 270,
+        "y": 460,
+        "wires": [
+            [
+                "75f2f6054145a6ae"
+            ]
+        ]
+    },
+    {
+        "id": "a5db4bdffce56e8d",
+        "type": "delay",
+        "z": "7d99d85256abc4c6",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "15",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 270,
+        "y": 60,
+        "wires": [
+            [
+                "1d8d2514591e1156"
+            ]
+        ]
+    },
+    {
+        "id": "fd1ee93eb1353643",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "a62f1fcff583fd86",
+        "type": "debug",
+        "z": "7d99d85256abc4c6",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "9e73cae136aca414",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://10.10.10.23:49370",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "3e6201438520f0d0",
+        "type": "eth-ip endpoint",
+        "address": "10.10.10.1",
+        "slot": "0",
+        "cycletime": "32000",
+        "name": "ABG1",
+        "vartable": {
+            "": {
+                "Program:MainProgram.LE201": {
+                    "type": "DINT"
+                }
+            }
+        }
+    },
+    {
+        "id": "cdc17675b5db9320",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-opcua": "0.2.340",
+            "node-red-contrib-ethernet-ip": "0.1.1"
+        }
+    }
+]
