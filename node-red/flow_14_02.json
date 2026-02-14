@@ -586,7 +586,7 @@
         "type": "function",
         "z": "7d99d85256abc4c6",
         "name": "format to Telegram",
-        "func": "let texto = msg.payload;\nlet fecha = new Date().toLocaleString(\"es-PE\");\n\nlet mensaje =\n`*Tensión de subestación*\n${texto} V\n📅 ${fecha}`;\n\nmsg.payload = {\n    type: \"message\",\n    content: mensaje,\n    chatId: \"-1003746509670\", //id de grupo de telegram\n    options: {\n        parse_mode: \"Markdown\"\n    }\n};\n\nreturn msg;",
+        "func": "let texto = msg.payload;\nlet fecha = new Date().toLocaleString(\"es-PE\");\n\nlet mensaje =\n`*Tensión de subestación*\n${texto} V\n📅 ${fecha}`;\n\nmsg.payload = {\n    type: \"message\",\n    content: mensaje,\n    chatId: \"-XXXXXXXXXXX\", //id de grupo de telegram\n    options: {\n        parse_mode: \"Markdown\"\n    }\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
