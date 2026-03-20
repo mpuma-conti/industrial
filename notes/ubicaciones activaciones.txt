@@ -1,0 +1,4 @@
+posible conflicto en la activacion de software FactoryTalk y Autodesk   
+
+C:\Program Files (x86)\Rockwell Software\FactoryTalk Activation\lmgrd.exe
+C:\Autodesk\Network License Manager\lmgrd.exe
