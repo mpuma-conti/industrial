@@ -3,6 +3,7 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 
 # Ruta al archivo JSON de credenciales, utilizar un prefijo de cadena cruda (r) antes de la cadena para indicar que no se deben interpretar secuencias de escape en esa cadena. Esto es útil cuando trabajas con rutas de archivo en Windows.
+# se creo clave json, esta en https://console.cloud.google.com/iam-admin/serviceaccounts/details/100417657165292125041?hl=es-419&project=spatial-dryad-246322
 ruta_credenciales = r'C:\Users\mantto2\Desktop\Codigos Python\BigQuery\spatial-dryad-246322-df7908d17aff.json'
 # Cargar las credenciales desde el archivo JSON
 credenciales = service_account.Credentials.from_service_account_file(
