@@ -1,3 +1,13 @@
+""" https://scadaflex.online/Operation?CodEst=866
+dirección del SVG que genera para el scada
+https://scadaflex.online/localdata/drawing/10_1653_0005.svg?CodEst=866
+despues de revisar el codigo fuente en <> se hallo que la api para obtener los valores de las variables estacion
+https://scadaflex.online/api/variable/38576
+devuelve un json
+los ID de las variables del scada pueden obtenerse de la siguiente tabla
+https://scadaflex.online/Registration/Variable?CodMed=1278&CodEmpr=799 """
+
+
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import json
