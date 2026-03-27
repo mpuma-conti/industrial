@@ -27,7 +27,7 @@ sql_server_conn = pyodbc.connect(
     "SERVER=APP-SRV-01;"
     "DATABASE=DB_SERVICIOS;"
     "UID=Erwin;"
-    "PWD=Inkabor999;"
+    "PWD=kabor999;"
 )
 # Crear cursor para conexion SQL
 sql_server_cursor = sql_server_conn.cursor()
