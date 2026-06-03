@@ -1,0 +1,46 @@
+import matplotlib.pyplot as plt
+import comtrade
+import pandas as pd
+import os
+from datetime import timedelta  # <-- Importamos timedelta para restar horas
+
+# 1. Cargar el archivo
+directorio_base = os.path.dirname(os.path.abspath(__file__))
+cfg_path = os.path.join(directorio_base, "COMTRADE", "cmt01304.cfg")
+dat_path = os.path.join(directorio_base, "COMTRADE", "cmt01304.dat")
+
+rec = comtrade.load(cfg_path, dat_path)
+
+# 2. Crear el DataFrame
+df = rec.to_dataframe()
+
+# --- NUEVO: Ajuste de Zona Horaria a UTC-5 ---
+# Restamos exactamente 5 horas a los metadatos de tiempo originales
+inicio_utc5 = rec.start_timestamp - timedelta(hours=5)
+disparo_utc5 = rec.trigger_timestamp - timedelta(hours=5)
+
+# 3. Crear la columna de Fecha y Hora Real y forzarla a TEXTO
+# Sumamos el tiempo relativo a la NUEVA fecha de inicio ajustada a UTC-5
+fecha_hora = inicio_utc5 + pd.to_timedelta(df.index, unit='s')
+
+# Convertimos a texto con formato de fórmula de Excel para blindar los milisegundos
+df.insert(0, 'Fecha_Hora_Real', fecha_hora.strftime('="%Y-%m-%d %H:%M:%S.%f"'))
+
+# 4. Guardar en CSV con metadatos incluidos
+csv_path = os.path.join(directorio_base, 'cmt01304.csv')
+
+# Paso A: Abrimos el archivo en modo escritura ('w') y escribimos los metadatos
+with open(csv_path, 'w', encoding='utf-8') as f:
+    f.write("================ METADATOS DEL ARCHIVO ================\n")
+    f.write(f"Estacion / Planta:       {rec.station_name}\n")
+    f.write(f"Frecuencia del Sistema:  {rec.frequency} Hz\n")
+    f.write(f"Fecha y Hora de Inicio:  {inicio_utc5} (UTC-5)\n")
+    f.write(f"Fecha y Hora de Disparo: {disparo_utc5} (UTC-5)\n")
+    f.write(f"Hora del Disparo: {rec.trigger_time}\n")
+    f.write("=======================================================\n")
+    f.write("\n") # Una línea en blanco para separar los metadatos de la tabla
+
+# Paso B: Anexamos la tabla debajo usando mode='a' (append)
+df.to_csv(csv_path, mode='a', index=True)
+
+print(f"¡Listo! Archivo CSV guardado (en horario UTC-5) con metadatos y fechas blindadas contra Excel en: {csv_path}")
