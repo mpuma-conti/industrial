@@ -6,8 +6,8 @@ import os
 
 # 1. Cargar el archivo
 directorio_base = os.path.dirname(os.path.abspath(__file__))
-cfg_path = os.path.join(directorio_base, "COMTRADE", "cmt01303.cfg")
-dat_path = os.path.join(directorio_base, "COMTRADE", "cmt01303.dat")
+cfg_path = os.path.join(directorio_base, "COMTRADE", "cmt01304.cfg")
+dat_path = os.path.join(directorio_base, "COMTRADE", "cmt01304.dat")
 
 rec = comtrade.load(cfg_path, dat_path)
 
@@ -23,7 +23,7 @@ fecha_hora = rec.start_timestamp + pd.to_timedelta(df.index, unit='s')
 df.insert(0, 'Fecha_Hora_Real', fecha_hora.strftime('="%Y-%m-%d %H:%M:%S.%f"'))
 
 # 4. Guardar en CSV con metadatos incluidos
-csv_path = os.path.join(directorio_base, 'cmt01303.csv')
+csv_path = os.path.join(directorio_base, 'cmt01304.csv')
 
 # Paso A: Abrimos el archivo en modo escritura ('w') y escribimos los metadatos como texto
 with open(csv_path, 'w', encoding='utf-8') as f:
